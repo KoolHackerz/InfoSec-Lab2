@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hill Cipher - Laboratory Work #2</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/png" href="icon.png" />
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <div class="header-content">
+          <div class="logo">
+            <i class="fas fa-lock"></i>
+            <h1>Hill Cipher</h1>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="cipher-workspace">
+          <section class="input-section">
+            <div class="section-header">
+              <i class="fas fa-edit"></i>
+              <h2>Text Input</h2>
+            </div>
+            <div class="input-container">
+              <div class="input-group">
+                <label for="text-input">Enter your text:</label>
+                <textarea
+                  id="text-input"
+                  placeholder="Type your message here... (e.g., VELES)"
+                  maxlength="1000"
+                >
+VELES</textarea
+                >
+                <div class="input-info">
+                  <span class="char-count">5 characters</span>
+                  <span class="status-indicator">Ready</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="matrix-section">
+            <div class="section-header">
+              <i class="fas fa-th"></i>
+              <h2>Encryption Matrix (3×3)</h2>
+            </div>
+            <div class="matrix-container">
+              <div class="matrix-grid">
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m00"
+                  value="6"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m01"
+                  value="24"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m02"
+                  value="1"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m10"
+                  value="13"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m11"
+                  value="16"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m12"
+                  value="10"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m20"
+                  value="20"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m21"
+                  value="17"
+                  min="0"
+                  max="25"
+                />
+                <input
+                  type="number"
+                  class="matrix-cell"
+                  id="m22"
+                  value="15"
+                  min="0"
+                  max="25"
+                />
+              </div>
+              <div class="matrix-info">
+                <div class="matrix-status">
+                  <i class="fas fa-check-circle"></i>
+                  <span>Matrix is valid</span>
+                </div>
+                <div class="matrix-details">
+                  <span>Det = <span id="determinant">441</span></span>
+                  <span>Det mod 26 = <span id="det-mod">25</span></span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="operation-section">
+            <div class="section-header">
+              <i class="fas fa-cogs"></i>
+              <h2>Operation</h2>
+            </div>
+            <div class="operation-controls">
+              <div class="operation-buttons">
+                <button class="operation-btn encrypt-btn" id="encrypt-btn">
+                  <i class="fas fa-lock"></i>
+                  <span>Encrypt</span>
+                </button>
+                <button class="operation-btn decrypt-btn" id="decrypt-btn">
+                  <i class="fas fa-unlock"></i>
+                  <span>Decrypt</span>
+                </button>
+              </div>
+              <button class="reset-btn" id="reset-btn">
+                <i class="fas fa-redo"></i>
+                Reset
+              </button>
+            </div>
+          </section>
+
+          <section class="results-section" id="results-section">
+            <div class="section-header">
+              <i class="fas fa-chart-line"></i>
+              <h2>Results</h2>
+            </div>
+            <div class="results-container" id="results-container">
+              <div class="results-placeholder">
+                <i class="fas fa-play-circle"></i>
+                <p>Select an operation to see the results</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="info-panel">
+        <div class="info-content">
+          <div class="info-header">
+            <i class="fas fa-info-circle"></i>
+            <h3>Information</h3>
+          </div>
+          <div class="info-card">
+            <h4>Alphabet Mapping</h4>
+            <div class="alphabet-table">
+              <div class="alphabet-header">
+                <span>Letter</span>
+                <span>Value</span>
+              </div>
+              <div class="alphabet-body">
+                <div class="alphabet-column">
+                  <div class="alphabet-pair"><span>A</span><span>0</span></div>
+                  <div class="alphabet-pair"><span>B</span><span>1</span></div>
+                  <div class="alphabet-pair"><span>C</span><span>2</span></div>
+                  <div class="alphabet-pair"><span>D</span><span>3</span></div>
+                  <div class="alphabet-pair"><span>E</span><span>4</span></div>
+                  <div class="alphabet-pair"><span>F</span><span>5</span></div>
+                  <div class="alphabet-pair"><span>G</span><span>6</span></div>
+                  <div class="alphabet-pair"><span>H</span><span>7</span></div>
+                  <div class="alphabet-pair"><span>I</span><span>8</span></div>
+                </div>
+                <div class="alphabet-column">
+                  <div class="alphabet-pair"><span>J</span><span>9</span></div>
+                  <div class="alphabet-pair"><span>K</span><span>10</span></div>
+                  <div class="alphabet-pair"><span>L</span><span>11</span></div>
+                  <div class="alphabet-pair"><span>M</span><span>12</span></div>
+                  <div class="alphabet-pair"><span>N</span><span>13</span></div>
+                  <div class="alphabet-pair"><span>O</span><span>14</span></div>
+                  <div class="alphabet-pair"><span>P</span><span>15</span></div>
+                  <div class="alphabet-pair"><span>Q</span><span>16</span></div>
+                  <div class="alphabet-pair"><span>R</span><span>17</span></div>
+                </div>
+                <div class="alphabet-column">
+                  <div class="alphabet-pair"><span>S</span><span>18</span></div>
+                  <div class="alphabet-pair"><span>T</span><span>19</span></div>
+                  <div class="alphabet-pair"><span>U</span><span>20</span></div>
+                  <div class="alphabet-pair"><span>V</span><span>21</span></div>
+                  <div class="alphabet-pair"><span>W</span><span>22</span></div>
+                  <div class="alphabet-pair"><span>X</span><span>23</span></div>
+                  <div class="alphabet-pair"><span>Y</span><span>24</span></div>
+                  <div class="alphabet-pair"><span>Z</span><span>25</span></div>
+                </div>
+              </div>
+            </div>
+
+            <h4 style="margin-top: 20px">Matrix Requirements</h4>
+            <ul>
+              <li>
+                <i class="fas fa-check"></i> Matrix must be invertible mod 26
+              </li>
+              <li><i class="fas fa-check"></i> Determinant coprime to 26</li>
+              <li><i class="fas fa-check"></i> Values between 0-25</li>
+              <li><i class="fas fa-check"></i> Text padded to multiple of 3</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
