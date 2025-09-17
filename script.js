@@ -20,7 +20,7 @@ class HillCipher {
     // Моніторинг вводу тексту
     document
       .getElementById("text-input")
-      .addEventListener("input", () => this.updateCharCount());
+      .addEventListener("input", (e) => this.validateAndUpdateText(e));
 
     // Моніторинг вводу матриці з валідацією
     document.querySelectorAll(".matrix-cell").forEach((cell) => {
@@ -39,20 +39,97 @@ class HillCipher {
     const value = cell.value;
     const parsedValue = parseInt(value);
 
+    // Получаем позицию ячейки из ID (например, m00 -> (0,0))
+    const cellId = cell.id;
+    const row = parseInt(cellId.charAt(1)); // m00 -> charAt(1) = '0' -> row 0
+    const col = parseInt(cellId.charAt(2)); // m00 -> charAt(2) = '0' -> col 0
+    const position = `(${row},${col})`;
+
     // Видаляємо існуючі класи помилок
     cell.classList.remove("error", "warning");
 
     if (value === "") {
       cell.classList.add("error");
-      cell.title = "This field is required";
+      cell.title = `Matrix cell ${position}: This field is required`;
     } else if (isNaN(parsedValue)) {
       cell.classList.add("error");
-      cell.title = "Please enter a valid number";
+      cell.title = `Matrix cell ${position}: Please enter a valid number`;
     } else if (parsedValue < 0 || parsedValue > 25) {
       cell.classList.add("warning");
-      cell.title = "Value must be between 0 and 25";
+      cell.title = `Matrix cell ${position}: Value must be between 0 and 25 (current: ${parsedValue})`;
     } else {
-      cell.title = "Valid matrix value";
+      cell.title = `Matrix cell ${position}: Valid value (${parsedValue})`;
+    }
+  }
+
+  validateAndUpdateText(event) {
+    const textInput = event.target;
+    const text = textInput.value;
+
+    const hasNonLatin = /[^A-Za-z\s]/.test(text);
+
+    const cleanText = text.replace(/[^A-Za-z\s]/g, "");
+    const lettersOnly = cleanText.replace(/\s/g, "");
+    const exceedsLimit = lettersOnly.length > 20;
+
+    if (hasNonLatin) {
+      textInput.value = cleanText;
+      this.showTextError("Only Latin letters (A-Z) are allowed!");
+    } else if (exceedsLimit) {
+      let truncatedText = "";
+      let letterCount = 0;
+      for (let char of text) {
+        if (/[A-Za-z]/.test(char)) {
+          if (letterCount < 20) {
+            truncatedText += char;
+            letterCount++;
+          }
+        } else if (/\s/.test(char)) {
+          truncatedText += char;
+        }
+      }
+      textInput.value = truncatedText;
+      this.showTextError("Maximum 20 letters allowed!");
+    } else {
+      this.hideTextError();
+    }
+
+    this.updateCharCount();
+  }
+
+  showTextError(message) {
+    const textInput = document.getElementById("text-input");
+    const inputGroup = textInput.closest(".input-group");
+
+    this.hideTextError();
+
+    textInput.classList.add("error");
+
+    const errorElement = document.createElement("div");
+    errorElement.className = "text-error-message";
+    errorElement.style.cssText = `
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 4px;
+      padding: 8px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 4px;
+      border-left: 3px solid var(--error);
+    `;
+    errorElement.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i>${message}`;
+
+    inputGroup.appendChild(errorElement);
+  }
+
+  hideTextError() {
+    const textInput = document.getElementById("text-input");
+    const inputGroup = textInput.closest(".input-group");
+    const existingError = inputGroup.querySelector(".text-error-message");
+
+    textInput.classList.remove("error");
+
+    if (existingError) {
+      existingError.remove();
     }
   }
 
@@ -64,14 +141,30 @@ class HillCipher {
     const text = textInput.value;
     const cleanText = text.toUpperCase().replace(/[^A-Z]/g, "");
 
-    charCount.textContent = `${cleanText.length} characters`;
+    charCount.textContent = `${cleanText.length}/20 characters`;
 
-    if (cleanText.length > 0) {
-      statusIndicator.textContent = "Ready";
-      statusIndicator.style.background = "var(--success)";
+    if (cleanText.length > 20) {
+      statusIndicator.innerHTML =
+        '<i class="fas fa-exclamation-triangle"></i>Too long';
+      statusIndicator.style.background = "rgba(239, 68, 68, 0.1)";
+      statusIndicator.style.borderColor = "rgba(239, 68, 68, 0.3)";
+      statusIndicator.style.color = "var(--error)";
+    } else if (cleanText.length >= 18) {
+      statusIndicator.innerHTML =
+        '<i class="fas fa-exclamation-circle"></i>Near limit';
+      statusIndicator.style.background = "rgba(245, 158, 11, 0.1)";
+      statusIndicator.style.borderColor = "rgba(245, 158, 11, 0.3)";
+      statusIndicator.style.color = "var(--warning)";
+    } else if (cleanText.length > 0) {
+      statusIndicator.innerHTML = '<i class="fas fa-check-circle"></i>Ready';
+      statusIndicator.style.background = "rgba(34, 197, 94, 0.1)";
+      statusIndicator.style.borderColor = "rgba(34, 197, 94, 0.3)";
+      statusIndicator.style.color = "var(--success)";
     } else {
-      statusIndicator.textContent = "Empty";
-      statusIndicator.style.background = "var(--warning)";
+      statusIndicator.innerHTML = '<i class="fas fa-info-circle"></i>Empty';
+      statusIndicator.style.background = "rgba(107, 114, 128, 0.1)";
+      statusIndicator.style.borderColor = "rgba(107, 114, 128, 0.3)";
+      statusIndicator.style.color = "var(--text-muted)";
     }
   }
 
@@ -121,6 +214,20 @@ class HillCipher {
 
     if (!text.trim()) {
       this.showError("Please enter some text to process");
+      return;
+    }
+
+    const hasNonLatin = /[^A-Za-z\s]/.test(text);
+    if (hasNonLatin) {
+      this.showError(
+        "Text contains invalid characters. Only Latin letters (A-Z) are allowed!"
+      );
+      return;
+    }
+
+    const cleanTextLength = text.replace(/[^A-Za-z]/g, "").length;
+    if (cleanTextLength > 20) {
+      this.showError("Text exceeds maximum length of 20 letters!");
       return;
     }
 
@@ -427,6 +534,7 @@ class HillCipher {
         `;
 
     // Оновлення інтерфейсу
+    this.hideTextError();
     this.updateCharCount();
     this.updateMatrixInfo();
   }
@@ -562,17 +670,13 @@ class HillCipher {
 
         // Перевірка на порожні поля або невалідні значення
         if (cellValue === "" || isNaN(parsedValue)) {
-          throw new Error(
-            `Matrix cell [${i + 1},${j + 1}] is empty or invalid`
-          );
+          throw new Error(`Matrix cell (${i},${j}) is empty or invalid`);
         }
 
         // Перевірка на значення поза межами 0-25
         if (parsedValue < 0 || parsedValue > 25) {
           throw new Error(
-            `Matrix cell [${i + 1},${
-              j + 1
-            }] must be between 0-25 (current: ${parsedValue})`
+            `Matrix cell (${i},${j}) must be between 0-25 (current value: ${parsedValue})`
           );
         }
 

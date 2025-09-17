@@ -35,13 +35,14 @@
                 <textarea
                   id="text-input"
                   placeholder="Type your message here... (e.g., VELES)"
-                  maxlength="1000"
                 >
 VELES</textarea
                 >
                 <div class="input-info">
-                  <span class="char-count">5 characters</span>
-                  <span class="status-indicator">Ready</span>
+                  <span class="char-count">5/20 characters</span>
+                  <span class="status-indicator"
+                    ><i class="fas fa-check-circle"></i>Ready</span
+                  >
                 </div>
               </div>
             </div>
@@ -227,6 +228,13 @@ VELES</textarea
               </div>
             </div>
 
+            <h4 style="margin-top: 20px">Text Requirements</h4>
+            <ul>
+              <li><i class="fas fa-check"></i> Only Latin letters (A-Z)</li>
+              <li><i class="fas fa-check"></i> Maximum 20 letters</li>
+              <li><i class="fas fa-check"></i> Text padded to multiple of 3</li>
+            </ul>
+
             <h4 style="margin-top: 20px">Matrix Requirements</h4>
             <ul>
               <li>
@@ -234,7 +242,6 @@ VELES</textarea
               </li>
               <li><i class="fas fa-check"></i> Determinant coprime to 26</li>
               <li><i class="fas fa-check"></i> Values between 0-25</li>
-              <li><i class="fas fa-check"></i> Text padded to multiple of 3</li>
             </ul>
           </div>
         </div>
